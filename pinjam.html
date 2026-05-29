@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="id-ID">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Form Peminjaman Kendaraan Dinas</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg-s: #4fc3f7; --bg-e: #1976d2;
+    --card: #eef2f7; --surf: #e8edf4;
+    --sl: rgba(255,255,255,0.85); --sd: rgba(163,177,198,0.6);
+    --acc: #1a7fd4; --accl: #42a5f5;
+    --ag: linear-gradient(135deg,#42a5f5,#1565c0);
+    --tm: #2c3e60; --ts: #7a90b0; --tl: #5a7090;
+    --r: 14px; --rs: 9px;
+    --fh: 'Exo 2',sans-serif; --fb: 'Nunito',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%;width:100%}
+  body{
+    min-height:100vh;
+    background:linear-gradient(135deg,var(--bg-s) 0%,var(--bg-e) 100%);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--fb);padding:24px 16px;position:relative;overflow-x:hidden;
+  }
+  body::before,body::after{
+    content:'';position:fixed;border-radius:50%;
+    background:rgba(255,255,255,0.12);pointer-events:none;
+  }
+  body::before{width:380px;height:380px;top:-80px;left:-80px}
+  body::after {width:260px;height:260px;bottom:-60px;right:-60px}
+
+  .card{
+    background:var(--card);border-radius:26px;
+    width:100%;max-width:560px;
+    box-shadow:14px 14px 28px var(--sd),-8px -8px 20px var(--sl);
+    overflow:hidden;
+  }
+  .card-header{
+    background:var(--card);padding:12px 14px 12px;
+    border-bottom:1px solid rgba(163,177,198,0.3);
+    display:flex;align-items:center;gap:4px;
+  }
+  .hdr-logos-left{display:flex;align-items:center;gap:6px;flex-shrink:0;min-width:0;}
+  .hdr-logos-right{display:flex;align-items:center;flex-shrink:0;min-width:0;}
+  .hdr-logo-img{height:40px;width:auto;object-fit:contain;display:none;}
+  .hdr-logo-img.sktj{height:25px;}
+  .hdr-center{flex:1;text-align:center;min-width:0;padding:0 6px;}
+  .h-sub{
+    font-family:var(--fh);font-size:8px;font-weight:700;
+    letter-spacing:1.4px;text-transform:uppercase;color:var(--acc);margin-bottom:3px;
+    white-space:nowrap;
+  }
+  .h-title{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--tm)}
+
+  .prog{height:3px;background:rgba(163,177,198,0.3)}
+  .prog-fill{height:100%;background:var(--ag);border-radius:2px;transition:width .4s ease;width:16.66%}
+
+  /* Tabs nav */
+  .tabs-nav{
+    display:flex;background:var(--card);
+    padding:10px 14px 0;gap:3px;overflow-x:auto;scrollbar-width:none;
+  }
+  .tabs-nav::-webkit-scrollbar{display:none}
+  .tab-btn{
+    flex:0 0 auto;background:none;border:none;cursor:pointer;
+    padding:6px 11px;font-family:var(--fb);font-size:10.5px;font-weight:600;
+    color:var(--ts);border-radius:var(--rs) var(--rs) 0 0;
+    transition:all .25s;white-space:nowrap;
+  }
+  .tab-btn.active{color:var(--acc);background:var(--surf);
+    box-shadow:inset 3px 3px 6px var(--sd),inset -2px -2px 5px var(--sl)}
+  .tab-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:17px;height:17px;border-radius:50%;
+    background:rgba(163,177,198,0.35);font-size:9px;font-weight:700;
+    margin-right:4px;color:var(--ts);transition:all .25s;
+  }
+  .tab-btn.active .tab-num{background:var(--ag);color:#fff}
+  .tab-btn.done .tab-num{background:#4caf50;color:#fff}
+
+  /* Body */
+  .tabs-body{padding:18px 26px 22px;background:var(--surf)}
+  .tab-panel{display:none;animation:fi .3s ease}
+  .tab-panel.active{display:block}
+  @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  .sec-title{
+    font-family:var(--fh);font-size:12px;font-weight:700;
+    color:var(--acc);text-transform:uppercase;letter-spacing:1.2px;
+    margin-bottom:14px;display:flex;align-items:center;gap:8px;
+  }
+  .sec-title::after{content:'';flex:1;height:1.5px;
+    background:linear-gradient(90deg,rgba(26,127,212,0.3),transparent)}
+
+  .field{margin-bottom:13px}
+  .field label{
+    display:block;font-size:10px;font-weight:600;color:var(--tl);
+    text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;
+  }
+  .field label .req{color:#e53935;margin-left:2px}
+  .fw{position:relative}
+  .fi{
+    position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    color:var(--accl);pointer-events:none;font-size:13px;
+  }
+  .neu{
+    width:100%;padding:10px 13px 10px 38px;
+    font-family:var(--fb);font-size:13px;font-weight:500;color:var(--tm);
+    background:var(--surf);border:none;border-radius:var(--rs);
+    box-shadow:inset 4px 4px 8px var(--sd),inset -3px -3px 7px var(--sl);
+    outline:none;transition:box-shadow .25s;-webkit-appearance:none;
+  }
+  .neu:focus{
+    box-shadow:inset 5px 5px 10px var(--sd),inset -4px -4px 8px var(--sl),
+               0 0 0 2px rgba(26,127,212,0.3);
+  }
+  .neu::placeholder{color:rgba(90,112,144,0.45)}
+  .neu[readonly]{color:#1a1a2e;font-weight:700;cursor:default}
+  .neu.ni{padding-left:13px}
+  select.neu{cursor:pointer}
+  textarea.neu{resize:vertical;min-height:80px;padding-top:10px;line-height:1.5;font-size:12.5px}
+  .fw textarea.neu + .fi{top:14px;transform:none}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+
+  .pax-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .pax-num{
+    min-width:22px;height:22px;border-radius:50%;
+    background:var(--ag);color:#fff;font-size:9px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+
+  /* Nav buttons */
+  .nav{display:flex;gap:10px;margin-top:16px}
+  .btn{
+    flex:1;padding:11px;font-family:var(--fh);
+    font-size:12px;font-weight:700;letter-spacing:1px;
+    text-transform:uppercase;border:none;border-radius:var(--rs);cursor:pointer;transition:all .2s;
+  }
+  .btn-p{
+    background:var(--surf);color:var(--ts);
+    box-shadow:4px 4px 8px var(--sd),-3px -3px 7px var(--sl);
+  }
+  .btn-p:hover{color:var(--tm);box-shadow:6px 6px 12px var(--sd),-4px -4px 9px var(--sl)}
+  .btn-n{
+    background:var(--ag);color:#fff;
+    box-shadow:4px 4px 12px rgba(21,101,192,.4),-2px -2px 6px rgba(255,255,255,.3);
+  }
+  .btn-n:hover{box-shadow:6px 6px 16px rgba(21,101,192,.5);transform:translateY(-1px)}
+  .btn-s{
+    background:linear-gradient(135deg,#43a047,#1b5e20);color:#fff;
+    box-shadow:4px 4px 12px rgba(27,94,32,.4),-2px -2px 6px rgba(255,255,255,.3);
+  }
+  .btn-s:hover{box-shadow:6px 6px 16px rgba(27,94,32,.5);transform:translateY(-1px)}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+
+  /* Dots */
+  .dots{display:flex;justify-content:center;gap:6px;padding:12px 0 4px}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(163,177,198,.5);transition:all .3s}
+  .dot.active{background:var(--acc);width:20px;border-radius:4px}
+  .dot.done{background:#4caf50}
+
+  /* Date label */
+  .dlabel{font-size:11px;font-weight:600;color:var(--acc);margin-top:-8px;margin-bottom:10px;min-height:16px}
+
+  /* Summary */
+  #summary{font-size:12px;color:var(--tm);line-height:1.85}
+  .sum-sep{border:none;border-top:1px solid rgba(163,177,198,.35);margin:7px 0}
+  .sum-row{display:flex;gap:8px;margin-bottom:3px}
+  .sum-k{min-width:126px;color:var(--ts);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .sum-v{color:var(--tm);font-weight:600}
+
+  footer{
+    text-align:center;padding:9px 26px 15px;
+    font-size:9px;font-weight:600;letter-spacing:1.2px;
+    text-transform:uppercase;color:var(--ts);background:var(--surf);
+  }
+
+  /* Toast */
+  #toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);
+    padding:11px 22px;border-radius:30px;
+    font-family:var(--fb);font-size:13px;font-weight:600;color:#fff;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
+    transition:transform .4s cubic-bezier(.4,0,.2,1),opacity .4s;
+    opacity:0;pointer-events:none;z-index:999;
+  }
+  #toast.ok{background:#2e7d32}
+  #toast.err{background:#c62828}
+  #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+  /* Loading */
+  #loading{
+    display:none;position:fixed;inset:0;
+    background:rgba(25,118,210,.3);backdrop-filter:blur(4px);
+    z-index:900;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+  }
+  #loading.show{display:flex}
+  .spin{
+    width:44px;height:44px;border-radius:50%;
+    border:4px solid rgba(255,255,255,.3);border-top-color:#fff;
+    animation:sp .8s linear infinite;
+  }
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @keyframes popIn{from{opacity:0;transform:scale(0.85) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  #loading p{color:#fff;font-family:var(--fh);font-weight:600;font-size:13px}
+/* Custom 24-hour time picker */
+.time-wrap {
+  display: flex; align-items: center; gap: 4px;
+  position: relative;
+}
+.time-wrap .fi { position: static; color: var(--acc); font-size:14px; flex-shrink:0; }
+.time-sel {
+  flex: 1; padding: 11px 6px 11px 6px !important;
+  text-align: center; cursor: pointer;
+}
+.time-sep {
+  font-size: 18px; font-weight: 700; color: var(--acc);
+  line-height: 1; flex-shrink: 0; margin: 0 2px;
+}
+
+/* Force 24-hour display — sembunyikan AM/PM di semua browser */
+input[type="time"]::-webkit-datetime-edit-ampm-field { display: none !important; width: 0 !important; }
+input[type="time"]::-webkit-datetime-edit-hour-field,
+input[type="time"]::-webkit-datetime-edit-minute-field { min-width: 1.5em; }
+input[type="time"] { -webkit-appearance: textfield; }
+
+/* Custom Date Picker */
+.dp-overlay{
+  display:none;position:fixed;inset:0;z-index:800;
+}
+.dp-overlay.show{display:block;}
+.dp-popup{
+  position:absolute;
+  background:var(--card);border-radius:16px;
+  box-shadow:12px 12px 24px var(--sd),-6px -6px 16px var(--sl);
+  padding:16px;width:280px;z-index:801;
+  animation:popIn .2s cubic-bezier(.34,1.56,.64,1);
+}
+.dp-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.dp-nav{
+  background:var(--surf);border:none;border-radius:8px;
+  width:30px;height:30px;cursor:pointer;font-size:14px;
+  color:var(--acc);display:flex;align-items:center;justify-content:center;
+  box-shadow:3px 3px 6px var(--sd),-2px -2px 5px var(--sl);
+  transition:all .2s;
+}
+.dp-nav:hover{box-shadow:4px 4px 8px var(--sd),-3px -3px 6px var(--sl);}
+.dp-month-label{
+  font-family:var(--fh);font-size:13px;font-weight:700;color:var(--tm);
+}
+.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.dp-day-name{
+  text-align:center;font-size:9px;font-weight:700;
+  color:var(--ts);padding:4px 0;text-transform:uppercase;letter-spacing:.5px;
+}
+.dp-day{
+  text-align:center;padding:6px 2px;border-radius:7px;font-size:12px;
+  cursor:not-allowed;color:rgba(122,144,176,0.4);font-weight:400;
+  background:none;border:none;
+}
+.dp-day.enabled{
+  cursor:pointer;color:var(--tm);font-weight:800;
+  background:var(--surf);
+  box-shadow:2px 2px 5px var(--sd),-1px -1px 4px var(--sl);
+  transition:all .15s;
+}
+.dp-day.enabled:hover{
+  background:var(--acc);color:#fff;
+  box-shadow:2px 2px 8px rgba(26,127,212,0.4);
+}
+.dp-day.selected{
+  background:var(--ag);color:#fff;font-weight:800;
+  box-shadow:2px 2px 8px rgba(26,127,212,0.45);
+}
+.dp-day.today.enabled{
+  outline:2px solid var(--acc);outline-offset:-2px;
+}
+.dp-day.empty{background:none;box-shadow:none;cursor:default;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header">
+    <!-- Kiri: kemenhub + hubdat -->
+    <div class="hdr-logos-left">
+      <img id="logo-kemenhub" class="hdr-logo-img" alt="Kemenhub"/>
+      <img id="logo-hubdat"   class="hdr-logo-img" alt="Hubdat"/>
+    </div>
+    <!-- Tengah: teks -->
+    <div class="hdr-center">
+      <div class="h-sub">Direktorat Sarana dan Keselamatan Transportasi Jalan</div>
+      <div class="h-title">Form Peminjaman Kendaraan Dinas</div>
+    </div>
+    <!-- Kanan: sktj -->
+    <div class="hdr-logos-right">
+      <img id="logo-sktj" class="hdr-logo-img sktj" alt="SKTJ"/>
+    </div>
+  </div>
+
+  <div class="prog"><div class="prog-fill" id="pf"></div></div>
+
+  <div class="tabs-nav" id="tnav">
+    <button class="tab-btn" data-t="0" style="display:none"><span class="tab-num">0</span>Pemohon</button>
+    <button class="tab-btn active" data-t="1"><span class="tab-num">1</span>Kendaraan</button>
+    <button class="tab-btn" data-t="2"><span class="tab-num">2</span>Waktu</button>
+    <button class="tab-btn" data-t="3"><span class="tab-num">3</span>Tujuan</button>
+    <button class="tab-btn" data-t="4"><span class="tab-num">4</span>Pengguna</button>
+    <button class="tab-btn" data-t="5"><span class="tab-num">5</span>Konfirmasi</button>
+  </div>
+
+  <div class="tabs-body">
+
+    <!-- Tab 1: Data Pemohon (hidden) -->
+    <div class="tab-panel" id="p0">
+      <div class="sec-title">Data Pemohon</div>
+      <div class="field">
+        <label>Nama Lengkap <span class="req">*</span></label>
+        <div class="fw"><span class="fi">&#128100;</span>
+          <input class="neu" id="namaLengkap" type="text" placeholder="Masukkan nama lengkap"/>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>NIP <span class="req">*</span></label>
+          <div class="fw"><span class="fi">&#128204;</span>
+            <input class="neu" id="nip" type="text" placeholder="NIP 18 digit"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Nomor HP <span class="req">*</span></label>
+          <div class="fw"><span class="fi">&#128222;</span>
+            <input class="neu" id="nomorHp" type="tel" placeholder="08xx-xxxx-xxxx"/>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Jabatan <span class="req">*</span></label>
+        <div class="fw"><span class="fi">&#127970;</span>
+          <input class="neu" id="jabatan" type="text" placeholder="Jabatan / posisi"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Detail Kendaraan -->
+    <div class="tab-panel active" id="p1">
+      <div class="sec-title">Detail Kendaraan</div>
+      <div class="field">
+        <label>Plat Nomor <span class="req">*</span></label>
+        <div class="fw" style="display:flex;gap:8px;align-items:center;">
+          <span class="fi" style="position:static;transform:none;">&#128663;</span>
+          <select class="neu" id="platNomor" style="flex:1;padding-left:10px;">
+            <option value="">— Memuat data kendaraan... —</option>
+          </select>
+          <button onclick="refreshPlatNomor()" id="btnRefreshPlat" title="Refresh daftar plat nomor"
+            style="flex-shrink:0;width:36px;height:36px;border:none;border-radius:9px;cursor:pointer;
+            background:var(--surf);box-shadow:3px 3px 7px var(--sd),-2px -2px 5px var(--sl);
+            color:var(--acc);font-size:16px;display:flex;align-items:center;justify-content:center;
+            transition:all .2s;" title="Refresh Plat Nomor">&#8635;</button>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Merk</label>
+          <div class="fw"><span class="fi">&#127981;</span>
+            <input class="neu" id="merk" type="text" readonly placeholder="Otomatis"/>
+          </div>
+        </div>
+        <div class="field"><label>Tipe</label>
+          <div class="fw"><span class="fi">&#9881;</span>
+            <input class="neu" id="tipe" type="text" readonly placeholder="Otomatis"/>
+          </div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Model</label>
+          <div class="fw"><span class="fi">&#127775;</span>
+            <input class="neu" id="model" type="text" readonly placeholder="Otomatis"/>
+          </div>
+        </div>
+        <div class="field"><label>Jenis</label>
+          <div class="fw"><span class="fi">&#128200;</span>
+            <input class="neu" id="jenis" type="text" readonly placeholder="Otomatis"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Waktu -->
+    <div class="tab-panel" id="p2">
+      <div class="sec-title">Waktu Peminjaman</div>
+      <div class="row2">
+        <div class="field"><label>Tgl. Keluar <span class="req">*</span></label>
+          <div class="fw">
+            <span class="fi">&#128197;</span>
+            <input class="neu" id="tglPinjamDisplay" readonly placeholder="Pilih tanggal..."
+              onclick="openDatePicker('tglPinjam')" style="cursor:pointer"/>
+            <input type="hidden" id="tglPinjam"/>
+          </div>
+        </div>
+        <div class="field"><label>Jam Keluar <span class="req">*</span></label>
+          <div class="time-wrap">
+            <span class="fi" style="left:10px">&#128336;</span>
+            <select class="neu time-sel" id="wktPinjamH" aria-label="Jam"></select>
+            <span class="time-sep">:</span>
+            <select class="neu time-sel" id="wktPinjamM" aria-label="Menit"></select>
+            <input type="hidden" id="wktPinjam"/>
+          </div>
+        </div>
+      </div>
+      <div class="dlabel" id="dlP" style="display:none"></div>
+      <div class="row2">
+        <div class="field"><label>Tgl. Kembali <span class="req">*</span></label>
+          <div class="fw">
+            <span class="fi">&#128197;</span>
+            <input class="neu" id="tglKembaliDisplay" readonly placeholder="Pilih tanggal..."
+              onclick="openDatePicker('tglKembali')" style="cursor:pointer"/>
+            <input type="hidden" id="tglKembali"/>
+          </div>
+        </div>
+        <div class="field"><label>Jam Kembali <span class="req">*</span></label>
+          <div class="time-wrap">
+            <span class="fi" style="left:10px">&#128336;</span>
+            <select class="neu time-sel" id="wktKembaliH" aria-label="Jam"></select>
+            <span class="time-sep">:</span>
+            <select class="neu time-sel" id="wktKembaliM" aria-label="Menit"></select>
+            <input type="hidden" id="wktKembali"/>
+          </div>
+        </div>
+      </div>
+      <div class="dlabel" id="dlK" style="display:none"></div>
+    </div>
+
+    <!-- Tab 4: Tujuan -->
+    <div class="tab-panel" id="p3">
+      <div class="sec-title">Tujuan Penggunaan</div>
+      <div class="field"><label>Keperluan <span class="req">*</span></label>
+        <div class="fw"><span class="fi">&#128196;</span>
+          <select class="neu" id="keperluan" onchange="toggleLainnya()">
+            <option value="">— Pilih Keperluan —</option>
+            <option>Dinas Luar</option>
+            <option>Servis</option>
+            <option>Lainnya</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="lainnya-box" style="display:none">
+        <label>Keterangan Lainnya <span class="req">*</span></label>
+        <div class="fw"><span class="fi">&#128221;</span>
+          <input class="neu" id="keperluanLainnya" type="text" placeholder="Jelaskan keperluan lainnya..."/>
+        </div>
+      </div>
+      <div class="field" id="kendala-box" style="display:none">
+        <label>Kendala <span class="req">*</span></label>
+        <div class="fw"><span class="fi">&#9888;</span>
+          <textarea class="neu" id="kendala" rows="5" placeholder="Jelaskan kendala kendaraan..."></textarea>
+        </div>
+      </div>
+      <div class="field">
+        <label id="lokasiLabel">Lokasi Tujuan <span class="req">*</span></label>
+        <div class="fw"><span class="fi">&#128205;</span>
+          <input class="neu" id="lokasiTujuan" type="text" placeholder="Masukkan lokasi tujuan"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Pengguna -->
+    <div class="tab-panel" id="p4">
+      <div class="sec-title">Data Pengguna</div>
+      <div class="field"><label>Nama Pengguna <span class="req">*</span></label>
+        <div class="fw"><span class="fi">&#128100;</span>
+          <input class="neu" id="namaPengemudi" type="text" placeholder="Nama lengkap pengguna"/>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>NIP Pengguna</label>
+          <div class="fw"><span class="fi">&#128204;</span>
+            <input class="neu" id="nipPengemudi" type="text" placeholder="Opsional"
+            oninput="this.value=this.value.replace(/[^0-9\-]/g,'')"/>
+          </div>
+        </div>
+        <div class="field"><label>No. HP Pengguna <span class="req">*</span></label>
+          <div class="fw"><span class="fi">&#128222;</span>
+            <input class="neu" id="telpPengemudi" type="tel" placeholder="Min. 11 digit (cth: 08123456789)"
+            oninput="this.value=this.value.replace(/[^0-9\+]/g,''); validateTelp(this)"/>
+            <div id="telpError" style="font-size:10px;color:#e53935;margin-top:3px;display:none;">Minimal 11 digit angka</div>
+          </div>
+        </div>
+      </div>
+      <div id="penumpang-section" style="display:none">
+        <div class="sec-title" style="margin-top:6px">Data Penumpang</div>
+        <div class="field"><label>Jumlah Penumpang</label>
+          <div class="fw"><span class="fi">&#128101;</span>
+            <input class="neu" id="jmlPenumpang" type="number" min="0" max="20" placeholder="0" oninput="renderPax()"/>
+          </div>
+        </div>
+        <div id="pax-box"></div>
+      </div>
+    </div>
+
+    <!-- Tab 6: Konfirmasi -->
+    <div class="tab-panel" id="p5">
+      <div class="sec-title">Konfirmasi Data</div>
+      <div id="summary"></div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+      <button class="btn btn-p" id="bPrev" onclick="nav(-1)" style="display:none">&#8592; Kembali</button>
+      <button class="btn btn-n" id="bNext" onclick="nav(1)">Lanjut &#8594;</button>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <footer>DIREKTORAT SKTJ &copy;2026</footer>
+</div>
+
+<div id="toast"></div>
+<div id="loading"><div class="spin"></div><p>Mengirim data...</p></div>
+
+<!-- Success Modal -->
+<div id="success-overlay" style="display:none;position:fixed;inset:0;background:rgba(21,101,192,0.35);backdrop-filter:blur(4px);z-index:990;align-items:center;justify-content:center;">
+  <div id="success-modal" style="background:var(--card);border-radius:22px;padding:36px 40px;text-align:center;max-width:340px;width:90%;
+    box-shadow:16px 16px 32px rgba(163,177,198,0.6),-8px -8px 20px rgba(255,255,255,0.85);
+    animation:popIn .35s cubic-bezier(.34,1.56,.64,1);">
+    <div style="width:64px;height:64px;background:linear-gradient(135deg,#43a047,#1b5e20);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px;color:#fff;box-shadow:0 6px 18px rgba(27,94,32,0.35);">✓</div>
+    <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--tm);margin-bottom:16px;">Permohonan Berhasil Dikirim</div>
+    <div id="success-msg" style="font-size:12.5px;color:var(--ts);line-height:1.9;text-align:left;background:rgba(163,177,198,0.15);border-radius:10px;padding:12px 16px;"></div>
+    <div style="margin-top:16px;">
+      <div id="success-timer-bar" style="height:3px;background:rgba(163,177,198,0.3);border-radius:2px;overflow:hidden;">
+        <div id="success-timer-fill" style="height:100%;background:linear-gradient(90deg,#42a5f5,#1565c0);width:100%;transition:width 5s linear;border-radius:2px;"></div>
+      </div>
+      <div style="font-size:10px;color:var(--ts);margin-top:5px;letter-spacing:0.5px;">Menutup otomatis dalam <span id="success-countdown">5</span> detik...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State & Data ──────────────────────────────────────────────
+var START_TAB = 1;          // Tab Pemohon (index 0) hidden; mulai dari Kendaraan
+var cur = START_TAB, TOTAL = 6;
+var kendaraanMap = {};
+var MONTHS = ['Januari','Februari','Maret','April','Mei','Juni',
+              'Juli','Agustus','September','Oktober','November','Desember'];
+
+// ── Init ──────────────────────────────────────────────────────
+(function(){
+  // Dots — hanya untuk tab yang visible (index 1–5)
+  var dc = document.getElementById('dots');
+  for(var i=START_TAB;i<TOTAL;i++){
+    var d=document.createElement('div');
+    d.className='dot'+(i===START_TAB?' active':'');
+    d.dataset.i=i; dc.appendChild(d);
+  }
+
+  // Init custom 24-hour time pickers
+  initTimePicker('wktPinjamH','wktPinjamM','wktPinjam');
+  initTimePicker('wktKembaliH','wktKembaliM','wktKembali');
+
+  // Batasi Tgl. Keluar: hari ini s/d 7 hari ke depan
+  setTglPinjamRange();
+  // Filter jam keluar (aktif mulai jam sekarang jika pilih hari ini)
+  filterJamKeluar();
+
+  renderNav();
+
+  // Load kendaraan dari GAS
+  google.script.run
+    .withSuccessHandler(function(list){ buildPlatOptions(list); })
+    .withFailureHandler(function(){
+      document.getElementById('platNomor').innerHTML =
+        '<option value="">— Gagal memuat data —</option>';
+    })
+    .getKendaraan();
+
+  // Pre-fill Nomor HP fields with "08"
+  var hpEl = document.getElementById('nomorHp');
+  if(hpEl && !hpEl.value) hpEl.value = '08';
+  var telpEl = document.getElementById('telpPengemudi');
+  if(telpEl && !telpEl.value) telpEl.value = '08';
+
+  // Load logos dari GAS
+  google.script.run
+    .withSuccessHandler(function(logos){
+      function setLogo(key, imgId){
+        if(!logos[key]) return;
+        var img = document.getElementById(imgId);
+        if(!img) return;
+        img.src = logos[key];
+        img.style.display = 'block';
+      }
+      setLogo('kemenhub', 'logo-kemenhub');
+      setLogo('hubdat',   'logo-hubdat');
+      setLogo('sktj',     'logo-sktj');
+    })
+    .withFailureHandler(function(){})
+    .getLogos();
+})();
+
+// ── Kendaraan auto-fill ───────────────────────────────────────
+document.getElementById('platNomor').addEventListener('change', function(){
+  var k = kendaraanMap[this.value] || {};
+  document.getElementById('merk').value  = k.merk  || '';
+  document.getElementById('tipe').value  = k.tipe  || '';
+  document.getElementById('model').value = k.model || '';
+  document.getElementById('jenis').value = k.jenis || '';
+});
+
+// ── Custom 24-hour Time Picker ────────────────────────────────
+function validateTelp(el){
+  var digits = el.value.replace(/[^0-9]/g,'');
+  el.value = digits;
+  var err = document.getElementById('telpError');
+  if(!err) return;
+  if(!digits.length){ err.style.display='none'; return; }
+  if(digits.length<2 || digits.substring(0,2)!=='08'){ err.textContent='Harus diawali 08'; err.style.display='block'; }
+  else if(digits.length<11){ err.textContent='Minimal 11 digit angka'; err.style.display='block'; }
+  else { err.style.display='none'; }
+}
+
+function initTimePicker(hId, mId, hiddenId){
+  var hSel = document.getElementById(hId);
+  var mSel = document.getElementById(mId);
+
+  // Isi jam 00–23
+  hSel.innerHTML = '<option value="">HH</option>';
+  for(var h=0;h<24;h++){
+    var hv = h<10?'0'+h:''+h;
+    hSel.innerHTML += '<option value="'+hv+'">'+hv+'</option>';
+  }
+  // Isi menit per 5 menit
+  mSel.innerHTML = '<option value="">MM</option>';
+  for(var m=0;m<60;m+=5){
+    var mv = m<10?'0'+m:''+m;
+    mSel.innerHTML += '<option value="'+mv+'">'+mv+'</option>';
+  }
+
+  function sync(){
+    var h=hSel.value, mi=mSel.value;
+    document.getElementById(hiddenId).value = (h&&mi) ? h+':'+mi : '';
+    if(hiddenId === 'wktPinjam') filterKembaliTime();
+  }
+  hSel.addEventListener('change', sync);
+  mSel.addEventListener('change', sync);
+
+  // Untuk Jam Keluar: filter jam < jam sekarang jika tglPinjam = hari ini
+  if(hiddenId === 'wktPinjam'){
+    hSel.addEventListener('change', function(){ filterJamKeluar(); });
+  }
+}
+
+/**
+ * Jika Tgl. Keluar = hari ini, disable jam yang sudah lewat.
+ * Dipanggil setiap kali tglPinjam berubah (dari updLabel).
+ */
+function filterJamKeluar(){
+  var tglP  = document.getElementById('tglPinjam').value;
+  var hSel  = document.getElementById('wktPinjamH');
+  var mSel  = document.getElementById('wktPinjamM');
+  var today = toYMD(getToday());
+
+  if(tglP !== today){
+    // Bukan hari ini — semua jam aktif
+    Array.from(hSel.options).forEach(function(o){
+      o.disabled=false; o.style.color='';
+    });
+    enableAllTimeOpts(mSel);
+    return;
+  }
+
+  var now   = new Date();
+  var nowH  = now.getHours();
+  var nowM  = now.getMinutes();
+  var curH  = hSel.value;
+
+  // Disable jam yang sudah lewat
+  Array.from(hSel.options).forEach(function(o){
+    if(!o.value) return;
+    var h = parseInt(o.value);
+    o.disabled    = h < nowH;
+    o.style.color = h < nowH ? 'rgba(122,144,176,0.35)' : '';
+  });
+  // Reset jika jam yang dipilih sudah disable
+  if(curH && parseInt(curH) < nowH){
+    hSel.value=''; mSel.value='';
+    document.getElementById('wktPinjam').value='';
+  }
+  // Filter menit jika jam == jam sekarang
+  filterMenitKeluar(nowH, nowM);
+
+  // Re-filter menit setiap jam berubah
+  hSel.onchange = function(){
+    var h2=hSel.value, mi=mSel.value;
+    document.getElementById('wktPinjam').value = (h2&&mi)?h2+':'+mi:'';
+    filterMenitKeluar(nowH, nowM);
+    filterKembaliTime();
+  };
+}
+
+function filterMenitKeluar(nowH, nowM){
+  var hSel  = document.getElementById('wktPinjamH');
+  var mSel  = document.getElementById('wktPinjamM');
+  var selH  = parseInt(hSel.value);
+  var curM  = mSel.value;
+
+  Array.from(mSel.options).forEach(function(o){
+    if(!o.value) return;
+    var m = parseInt(o.value);
+    var disabled = !isNaN(selH) && selH === nowH && m <= nowM;
+    o.disabled    = disabled;
+    o.style.color = disabled ? 'rgba(122,144,176,0.35)' : '';
+  });
+  if(curM && !isNaN(selH) && selH === nowH && parseInt(curM) <= nowM){
+    mSel.value='';
+    document.getElementById('wktPinjam').value='';
+  }
+}
+
+/**
+ * Jika tglPinjam == tglKembali, disable jam/menit Kembali
+ * yang <= jam Pinjam. Reset pilihan jika sudah tidak valid.
+ */
+function filterKembaliTime(){
+  var tglP = document.getElementById('tglPinjam').value;
+  var tglK = document.getElementById('tglKembali').value;
+  var wktP = document.getElementById('wktPinjam').value; // "HH:MM"
+
+  var hKSel = document.getElementById('wktKembaliH');
+  var mKSel = document.getElementById('wktKembaliM');
+
+  // Jika tanggal berbeda atau belum ada wktPinjam, semua opsi aktif
+  if(!tglP || !tglK || tglP !== tglK || !wktP){
+    enableAllTimeOpts(hKSel);
+    enableAllTimeOpts(mKSel);
+    return;
+  }
+
+  var parts  = wktP.split(':');
+  var minH   = parseInt(parts[0]);
+  var minM   = parseInt(parts[1]);
+
+  // Filter opsi jam
+  var curHK = hKSel.value;
+  Array.from(hKSel.options).forEach(function(opt){
+    if(!opt.value) return; // placeholder HH
+    var h = parseInt(opt.value);
+    opt.disabled = h < minH;
+    opt.style.color = h < minH ? 'rgba(122,144,176,0.35)' : '';
+  });
+  // Jika jam kembali yang dipilih sekarang sudah disabled → reset
+  if(curHK && parseInt(curHK) < minH){
+    hKSel.value = ''; mKSel.value = '';
+    document.getElementById('wktKembali').value = '';
+  }
+
+  // Filter opsi menit berdasarkan jam kembali yang dipilih
+  filterKembaliMenit(minH, minM);
+
+  // Re-trigger filter menit setiap kali jam kembali berubah
+  hKSel.onchange = function(){
+    // sync hidden value
+    var h=hKSel.value, mi=mKSel.value;
+    document.getElementById('wktKembali').value = (h&&mi)?h+':'+mi:'';
+    filterKembaliMenit(minH, minM);
+  };
+}
+
+function filterKembaliMenit(minH, minM){
+  var hKSel = document.getElementById('wktKembaliH');
+  var mKSel = document.getElementById('wktKembaliM');
+  var selH  = parseInt(hKSel.value);
+  var curM  = mKSel.value;
+
+  Array.from(mKSel.options).forEach(function(opt){
+    if(!opt.value) return;
+    var m = parseInt(opt.value);
+    // Jika jam kembali == jam pinjam, menit harus > minM
+    var disabled = !isNaN(selH) && selH === minH && m <= minM;
+    opt.disabled = disabled;
+    opt.style.color = disabled ? 'rgba(122,144,176,0.35)' : '';
+  });
+  // Reset menit jika sudah tidak valid
+  if(curM && !isNaN(selH) && selH === minH && parseInt(curM) <= minM){
+    mKSel.value = '';
+    document.getElementById('wktKembali').value = '';
+  }
+}
+
+function enableAllTimeOpts(sel){
+  Array.from(sel.options).forEach(function(opt){
+    opt.disabled = false;
+    opt.style.color = '';
+  });
+  // Restore onchange ke sync default untuk wktKembaliH
+  if(sel.id === 'wktKembaliH'){
+    sel.onchange = function(){
+      var h=sel.value, mi=document.getElementById('wktKembaliM').value;
+      document.getElementById('wktKembali').value = (h&&mi)?h+':'+mi:'';
+    };
+  }
+}
+
+// ── Batasi rentang tanggal peminjaman ────────────────────────
+function toYMD(d){
+  var y=d.getFullYear(), m=d.getMonth()+1, dd=d.getDate();
+  return y+'-'+(m<10?'0'+m:m)+'-'+(dd<10?'0'+dd:dd);
+}
+
+function setTglPinjamRange(){
+  // hanya dipakai sebagai referensi, picker custom pakai dpMinDate/dpMaxDate
+}
+
+// ── Custom Date Picker ────────────────────────────────────────
+var dpTarget = null;   // 'tglPinjam' atau 'tglKembali'
+var dpYear   = 0;
+var dpMonth  = 0;
+
+var DAYS_ID = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+function getToday(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
+
+function getDpMin(){
+  if(dpTarget==='tglPinjam'){
+    return getToday();
+  } else {
+    // tglKembali min = tglPinjam yang dipilih (atau hari ini)
+    var v = document.getElementById('tglPinjam').value;
+    if(v){ var d=new Date(v+'T00:00:00'); d.setHours(0,0,0,0); return d; }
+    return getToday();
+  }
+}
+
+function getDpMax(){
+  if(dpTarget==='tglPinjam'){
+    var d=getToday(); d.setDate(d.getDate()+7); return d;
+  } else {
+    // tglKembali max = tglPinjam + 30 hari
+    var v = document.getElementById('tglPinjam').value;
+    if(v){
+      var d2=new Date(v+'T00:00:00'); d2.setHours(0,0,0,0);
+      d2.setDate(d2.getDate()+30); return d2;
+    }
+    return null;
+  }
+}
+
+function openDatePicker(targetId){
+  dpTarget = targetId;
+  var val = document.getElementById(targetId).value;
+  var now = val ? new Date(val+'T00:00:00') : getToday();
+  dpYear  = now.getFullYear();
+  dpMonth = now.getMonth();
+
+  var anchor  = document.getElementById(targetId+'Display');
+  var rect    = anchor.getBoundingClientRect();
+  var popup   = document.getElementById('dp-popup');
+  var popW    = 280;
+  var scrollX = window.scrollX, scrollY = window.scrollY;
+
+  // Coba posisi: samping kanan input
+  var left = rect.right + scrollX + 8;
+  var top  = rect.top  + scrollY;
+
+  // Jika tidak muat di kanan layar, geser ke kiri input
+  if(left + popW > window.innerWidth + scrollX) {
+    left = rect.left + scrollX - popW - 8;
+  }
+
+  // Jika popup akan keluar dari bawah layar, geser ke atas
+  var estHeight = 280;
+  if(top + estHeight > window.innerHeight + scrollY) {
+    top = window.innerHeight + scrollY - estHeight - 10;
+  }
+  if(top < scrollY + 10) top = scrollY + 10;
+
+  popup.style.top  = top  + 'px';
+  popup.style.left = left + 'px';
+
+  document.getElementById('dp-overlay').classList.add('show');
+  renderDpGrid();
+}
+
+function closeDatePicker(){
+  document.getElementById('dp-overlay').classList.remove('show');
+  dpTarget = null;
+}
+
+function dpNav(dir){
+  dpMonth += dir;
+  if(dpMonth > 11){ dpMonth=0; dpYear++; }
+  if(dpMonth < 0 ){ dpMonth=11; dpYear--; }
+  renderDpGrid();
+}
+
+function renderDpGrid(){
+  var minD = getDpMin();
+  var maxD = getDpMax();
+  var today= getToday();
+  var selVal = dpTarget ? document.getElementById(dpTarget).value : '';
+
+  var MONTHS_FULL=['Januari','Februari','Maret','April','Mei','Juni',
+                   'Juli','Agustus','September','Oktober','November','Desember'];
+  document.getElementById('dp-month-label').textContent = MONTHS_FULL[dpMonth]+' '+dpYear;
+
+  // Disable nav jika bulan tidak relevan
+  var firstOfMonth = new Date(dpYear, dpMonth, 1);
+  var lastOfMonth  = new Date(dpYear, dpMonth+1, 0);
+  document.getElementById('dp-prev').disabled = lastOfMonth < minD;
+  document.getElementById('dp-next').disabled = maxD && firstOfMonth > maxD;
+
+  var grid = document.getElementById('dp-grid');
+  grid.innerHTML = '';
+
+  // Header hari
+  DAYS_ID.forEach(function(d){
+    var el=document.createElement('div');
+    el.className='dp-day-name'; el.textContent=d;
+    grid.appendChild(el);
+  });
+
+  // Offset hari pertama (0=Min)
+  var firstDay = new Date(dpYear, dpMonth, 1).getDay();
+  for(var e=0;e<firstDay;e++){
+    var emp=document.createElement('button');
+    emp.className='dp-day empty'; emp.disabled=true;
+    grid.appendChild(emp);
+  }
+
+  // Tanggal
+  var daysInMonth = new Date(dpYear, dpMonth+1, 0).getDate();
+  for(var d=1;d<=daysInMonth;d++){
+    var thisDate = new Date(dpYear, dpMonth, d);
+    var ymd = toYMD(thisDate);
+    var btn = document.createElement('button');
+    btn.textContent = d;
+    var isEnabled = thisDate >= minD && (!maxD || thisDate <= maxD);
+    var isToday   = ymd === toYMD(today);
+    var isSelected= ymd === selVal;
+
+    btn.className = 'dp-day' +
+      (isEnabled  ? ' enabled' : '') +
+      (isToday    ? ' today'   : '') +
+      (isSelected ? ' selected': '');
+    btn.disabled = !isEnabled;
+
+    if(isEnabled){
+      (function(ymdVal, dispVal){
+        btn.onclick = function(){
+          document.getElementById(dpTarget).value = ymdVal;
+          document.getElementById(dpTarget+'Display').value = dispVal;
+          updLabel();
+          closeDatePicker();
+        };
+      })(ymd, fmtDate(ymd));
+    } else if(thisDate > getDpMax()){
+      btn.disabled = false;
+      btn.style.cursor = 'not-allowed';
+      btn.onclick = function(e){
+        e.stopPropagation();
+        var msg = dpTarget==='tglPinjam'
+          ? 'Tidak bisa memilih diatas 7 hari'
+          : 'Maksimal peminjaman 30 hari';
+        showDpNotif(msg);
+      };
+    }
+    grid.appendChild(btn);
+  }
+}
+
+function showDpNotif(msg){
+  var existing = document.getElementById('dp-notif');
+  if(existing) existing.remove();
+  var notif = document.createElement('div');
+  notif.id = 'dp-notif';
+  notif.textContent = msg;
+  notif.style.cssText =
+    'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'+
+    'background:#2c3e60;color:#fff;padding:14px 28px;border-radius:30px;'+
+    'font-family:\'Nunito\',sans-serif;font-size:13px;font-weight:700;'+
+    'box-shadow:0 8px 24px rgba(0,0,0,0.25);z-index:9999;'+
+    'animation:popIn .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;'+
+    'white-space:nowrap;';
+  document.body.appendChild(notif);
+  setTimeout(function(){ if(notif.parentNode) notif.parentNode.removeChild(notif); }, 2000);
+}
+
+// ── Date labels ───────────────────────────────────────────────
+function fmtDate(v){
+  if(!v) return '';
+  var p=v.split('-');
+  return parseInt(p[2])+' '+MONTHS[parseInt(p[1])-1]+' '+p[0];
+}
+function updLabel(){
+  var tglP = document.getElementById('tglPinjam').value;
+  var tglK = document.getElementById('tglKembali').value;
+  document.getElementById('dlP').textContent = tglP ? '📅 '+fmtDate(tglP) : '';
+  document.getElementById('dlK').textContent = tglK ? '📅 '+fmtDate(tglK) : '';
+  // Jika tglKembali lebih awal dari tglPinjam, reset
+  if(tglP && tglK && tglK < tglP){
+    document.getElementById('tglKembali').value = '';
+    document.getElementById('tglKembaliDisplay').value = '';
+    document.getElementById('dlK').textContent = '';
+  }
+  // Update filter waktu kembali setiap kali tanggal berubah
+  filterKembaliTime();
+  // Update filter jam keluar jika tgl keluar = hari ini
+  filterJamKeluar();
+}
+
+// ── Passengers ────────────────────────────────────────────────
+function renderPax(){
+  var n=parseInt(document.getElementById('jmlPenumpang').value)||0;
+  var c=document.getElementById('pax-box'); c.innerHTML='';
+  for(var i=1;i<=n;i++){
+    c.innerHTML+=
+      '<div style="margin-bottom:10px">'+
+        '<div class="pax-row" style="margin-bottom:5px">'+
+          '<div class="pax-num">'+i+'</div>'+
+          '<input class="neu ni" type="text" id="pax_'+i+'" placeholder="Nama penumpang ke-'+i+'" style="flex:1"/>'+
+        '</div>'+
+        '<div class="pax-row">'+
+          '<div style="min-width:22px;height:22px;flex-shrink:0"></div>'+
+          '<div class="fw" style="flex:1;position:relative">'+
+            '<span class="fi">&#128222;</span>'+
+            '<input class="neu" type="tel" id="paxTelp_'+i+'" placeholder="Nomor telepon ke-'+i+'" style="width:100%"/>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function nav(dir){
+  if(dir===1 && !validate(cur)) return;
+  if(dir===1){
+    var btns=document.querySelectorAll('.tab-btn');
+    btns[cur].classList.add('done');
+    btns[cur].classList.remove('active');
+  }
+  document.getElementById('p'+cur).classList.remove('active');
+  updDot(cur, false);
+  cur = Math.max(START_TAB, Math.min(TOTAL-1, cur+dir));
+  document.getElementById('p'+cur).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('active',i===cur)});
+  updDot(cur, true);
+  // progress: dari START_TAB s/d TOTAL
+  var visibleTotal = TOTAL - START_TAB;
+  var visibleCur   = cur - START_TAB;
+  document.getElementById('pf').style.width=((visibleCur+1)/visibleTotal*100)+'%';
+  if(cur===TOTAL-1) buildSummary();
+  renderNav();
+}
+
+function updDot(tabIdx, setActive){
+  // Dot index = tabIdx - START_TAB (karena dots hanya dibuat untuk visible tabs)
+  var dots = document.querySelectorAll('.dot');
+  var di = tabIdx - START_TAB;
+  dots.forEach(function(d,i){
+    if(setActive){
+      d.classList.toggle('active', i===di);
+      if(i<di) d.classList.add('done'); else if(i>di) d.classList.remove('done');
+    } else {
+      if(i===di) d.classList.remove('active');
+    }
+  });
+}
+
+function renderNav(){
+  var bp=document.getElementById('bPrev'), bn=document.getElementById('bNext');
+  bp.style.display = cur===START_TAB?'none':'block';
+  if(cur===TOTAL-1){
+    bn.textContent='✓ Kirim Permohonan'; bn.className='btn btn-s';
+    bn.onclick=submitForm;
+  } else {
+    bn.textContent='Lanjut →'; bn.className='btn btn-n';
+    bn.onclick=function(){nav(1)};
+  }
+}
+
+// Tab header click (hanya bisa kembali ke tab yang visible)
+document.getElementById('tnav').addEventListener('click', function(e){
+  var btn=e.target.closest('.tab-btn');
+  if(!btn || btn.style.display==='none') return;
+  var t=parseInt(btn.dataset.t);
+  // Hanya bisa klik tab yang sudah pernah dikunjungi (done) atau tab aktif
+  if(t===cur) return; // sudah aktif, tidak perlu apa-apa
+  if(t<START_TAB) return; // tab hidden
+  // Tab ke depan hanya bisa diklik jika sudah done
+  if(t>cur && !btn.classList.contains('done')) return;
+  // Tab ke belakang selalu boleh
+  document.getElementById('p'+cur).classList.remove('active');
+  document.querySelectorAll('.tab-btn')[cur].classList.remove('active');
+  updDot(cur, false);
+  cur=t;
+  document.getElementById('p'+cur).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('active',i===cur)});
+  updDot(cur, true);
+  var visibleTotal = TOTAL - START_TAB;
+  document.getElementById('pf').style.width=(((cur-START_TAB)+1)/visibleTotal*100)+'%';
+  if(cur===TOTAL-1) buildSummary();
+  renderNav();
+});
+
+// ── Validation ────────────────────────────────────────────────
+function validate(tab){
+  var checks={
+    0: function(){return req(['namaLengkap','nip','nomorHp','jabatan'])},
+    1: function(){return req(['platNomor'])},
+    2: function(){return req(['tglPinjam','wktPinjam','tglKembali','wktKembali'])&&chkDates()},
+     3: function(){
+         if(!req(['keperluan','lokasiTujuan'])) return false;
+         if(g('keperluan')==='Lainnya' && !g('keperluanLainnya').trim()){
+           req(['keperluanLainnya']); return false;
+         }
+         if(g('keperluan')==='Servis' && !g('kendala').trim()){
+           req(['kendala']); return false;
+         }
+         return true;
+       },
+     4: function(){
+         if(!req(['namaPengemudi','telpPengemudi'])) return false;
+         var telp = g('telpPengemudi').replace(/[^0-9]/g,'');
+         var errEl=document.getElementById('telpError');
+         if(telp.length<2 || telp.substring(0,2)!=='08'){
+           if(errEl){errEl.textContent='Harus diawali 08';errEl.style.display='block';}
+           document.getElementById('telpPengemudi').style.boxShadow=
+             'inset 4px 4px 8px rgba(229,57,53,0.25),inset -3px -3px 7px var(--sl),0 0 0 2px rgba(229,57,53,0.4)';
+           setTimeout(function(){
+             document.getElementById('telpPengemudi').style.boxShadow='';
+           },2000);
+           return false;
+         }
+         if(telp.length < 11){
+           if(errEl){errEl.textContent='Minimal 11 digit angka';errEl.style.display='block';}
+           document.getElementById('telpPengemudi').style.boxShadow=
+             'inset 4px 4px 8px rgba(229,57,53,0.25),inset -3px -3px 7px var(--sl),0 0 0 2px rgba(229,57,53,0.4)';
+           setTimeout(function(){
+             document.getElementById('telpPengemudi').style.boxShadow='';
+           },2000);
+           return false;
+         }
+         if(errEl) errEl.style.display='none';
+         return true;
+       },
+    5: function(){return true},
+  };
+  return checks[tab] ? checks[tab]() : true;
+}
+
+function toggleLainnya(){
+  var val = document.getElementById('keperluan').value;
+  // Tampil/sembunyikan textbox Lainnya
+  document.getElementById('lainnya-box').style.display = val==='Lainnya' ? 'block' : 'none';
+  if(val!=='Lainnya') document.getElementById('keperluanLainnya').value='';
+
+  // Tampil/sembunyikan Kendala jika pilih Servis
+  var isServis = val === 'Servis';
+  document.getElementById('kendala-box').style.display = isServis ? 'block' : 'none';
+  if(!isServis) document.getElementById('kendala').value='';
+
+  // Ganti label & placeholder Lokasi jika pilih Servis
+  document.getElementById('lokasiLabel').innerHTML =
+    (isServis ? 'Lokasi Bengkel' : 'Lokasi Tujuan') + ' <span class="req">*</span>';
+  document.getElementById('lokasiTujuan').placeholder =
+    isServis ? 'Masukkan lokasi bengkel' : 'Masukkan lokasi tujuan';
+}
+function req(ids){
+  var ok=true;
+  ids.forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el||!el.value.trim()){
+      if(el){
+        el.style.boxShadow='inset 4px 4px 8px rgba(229,57,53,.25),inset -3px -3px 7px var(--sl),0 0 0 2px rgba(229,57,53,.4)';
+        setTimeout(function(){el.style.boxShadow=''},2200);
+      }
+      ok=false;
+    }
+  });
+  if(!ok) shake();
+  return ok;
+}
+function chkDates(){
+  var p=new Date(document.getElementById('tglPinjam').value+'T'+document.getElementById('wktPinjam').value);
+  var k=new Date(document.getElementById('tglKembali').value+'T'+document.getElementById('wktKembali').value);
+  if(k<=p){alert('Waktu kembali harus setelah waktu peminjaman.');return false}
+  return true;
+}
+function shake(){
+  var c=document.querySelector('.card');
+  c.style.transform='translateX(-6px)';
+  setTimeout(function(){c.style.transform='translateX(6px)'},80);
+  setTimeout(function(){c.style.transform='translateX(0)'},160);
+}
+
+// ── Summary ───────────────────────────────────────────────────
+function g(id){return(document.getElementById(id)||{}).value||''}
+function buildSummary(){
+  var kepVal = g('keperluan');
+  var kepDisplay = kepVal==='Lainnya' ? 'Lainnya — '+g('keperluanLainnya') : kepVal;
+
+  var rows=[
+    {k:'Plat Nomor',v:g('platNomor')},
+    {k:'Kendaraan',v:g('merk')+' '+g('tipe')+' ('+g('model')+')'},
+    {k:'Jenis',v:g('jenis')},
+    {sep:1},
+    {k:'Tgl. Pinjam',v:fmtDate(g('tglPinjam'))+' · '+g('wktPinjam')},
+    {k:'Tgl. Masuk',v:fmtDate(g('tglKembali'))+' · '+g('wktKembali')},
+    {sep:1},
+    {k:'Keperluan',v:kepDisplay},
+    {k: g('keperluan')==='Servis' ? 'Lokasi Bengkel' : 'Lokasi Tujuan', v:g('lokasiTujuan')},
+    g('keperluan')==='Servis' ? {k:'Kendala',v:g('kendala')} : null,
+    {sep:1},
+    {k:'Pengguna',v:g('namaPengemudi')},{k:'NIP Pengguna',v:g('nipPengemudi')||'-'},
+    {k:'Telp Pengguna',v:g('telpPengemudi')},
+  ];
+
+  var html='';
+  rows.forEach(function(r){
+    if(!r) return;
+    if(r.sep) html+='<hr class="sum-sep"/>';
+    else html+='<div class="sum-row"><span class="sum-k">'+esc(r.k)+'</span><span class="sum-v">'+esc(r.v)+'</span></div>';
+  });
+  document.getElementById('summary').innerHTML=html;
+}
+
+// ── Submit via google.script.run ──────────────────────────────
+function submitForm(){
+  var n=parseInt(g('jmlPenumpang'))||0, pArr=[], pTelp=[];
+  for(var i=1;i<=n;i++){
+    pArr.push(g('pax_'+i));
+    pTelp.push(g('paxTelp_'+i));
+  }
+
+  var kepVal = g('keperluan');
+  var kepFinal = kepVal==='Lainnya' ? 'Lainnya — '+g('keperluanLainnya') : kepVal;
+
+  var data={
+    namaLengkap:g('namaLengkap'), nip:g('nip'), jabatan:g('jabatan'), nomorHp:g('nomorHp'),
+    platNomor:g('platNomor'), merk:g('merk'), tipe:g('tipe'), model:g('model'), jenis:g('jenis'),
+    tglPinjam:fmtDate(g('tglPinjam')), wktPinjam:g('wktPinjam'),
+    tglKembali:fmtDate(g('tglKembali')), wktKembali:g('wktKembali'),
+    keperluan:kepFinal, lokasiTujuan:g('lokasiTujuan'), kendala:g('kendala'),
+    namaPengemudi:g('namaPengemudi'), nipPengemudi:g('nipPengemudi'), telpPengemudi:g('telpPengemudi'),
+    jumlahPenumpang:n, penumpang:pArr.join(' | '), telpPenumpang:pTelp.join(' | '),
+  };
+
+  var bn=document.getElementById('bNext');
+  bn.disabled=true;
+  document.getElementById('loading').classList.add('show');
+
+  google.script.run
+    .withSuccessHandler(function(res){
+      document.getElementById('loading').classList.remove('show');
+      bn.disabled=false;
+      if(res.status==='ok'){
+        showSuccessModal(data);
+      } else {
+        toast('⚠ Gagal: '+(res.message||'error'),'err');
+      }
+    })
+    .withFailureHandler(function(err){
+      document.getElementById('loading').classList.remove('show');
+      bn.disabled=false;
+      toast('⚠ Error: '+err.message,'err');
+    })
+    .simpanPeminjaman(data);
+}
+
+function showSuccessModal(data){
+  var rows=[
+    ['Permohonan','telah tercatat'],
+    ['Kendaraan', data.platNomor+' — '+data.merk+' '+data.tipe],
+    ['Pinjam',    data.tglPinjam+' '+data.wktPinjam],
+    ['Kembali',   data.tglKembali+' '+data.wktKembali],
+    ['Pengguna', data.namaPengemudi],
+  ];
+  var html='';
+  rows.forEach(function(r){
+    html+='<div style="display:flex;gap:8px;margin-bottom:3px;">'+
+      '<span style="min-width:80px;font-weight:700;color:var(--tm)">'+esc(r[0])+'</span>'+
+      '<span style="color:var(--ts)">'+esc(r[1])+'</span></div>';
+  });
+  document.getElementById('success-msg').innerHTML=html;
+
+  var ov=document.getElementById('success-overlay');
+  ov.style.display='flex';
+
+  // Mulai timer bar
+  var fill=document.getElementById('success-timer-fill');
+  fill.style.transition='none';
+  fill.style.width='100%';
+  void fill.offsetWidth;
+  fill.style.transition='width 5s linear';
+  fill.style.width='0%';
+
+  // Countdown 5 → 4 → 3 → 2 → 1
+  var cd = document.getElementById('success-countdown');
+  var count = 5;
+  cd.textContent = count;
+  clearInterval(window._successInterval);
+  window._successInterval = setInterval(function(){
+    count--;
+    cd.textContent = count;
+    if(count <= 0) clearInterval(window._successInterval);
+  }, 1000);
+
+  // Auto close setelah 5 detik
+  clearTimeout(window._successTimer);
+  window._successTimer = setTimeout(function(){
+    clearInterval(window._successInterval);
+    ov.style.display='none';
+    resetForm();
+  }, 5000);
+}
+
+function closeSuccessAndReset(){
+  clearTimeout(window._successTimer);
+  clearInterval(window._successInterval);
+  document.getElementById('success-overlay').style.display='none';
+  resetForm();
+}
+
+function resetForm(){
+  // Kosongkan semua input & select kecuali platNomor (reload dari GAS)
+  document.querySelectorAll('input, select, textarea').forEach(function(el){
+    if(el.id==='platNomor') return;
+    if(el.type==='checkbox'||el.type==='radio') el.checked=false;
+    else el.value='';
+  });
+
+  // Reset platNomor ke loading state, reload dari GAS
+  var sel = document.getElementById('platNomor');
+  sel.innerHTML = '<option value="">— Memuat data... —</option>';
+  kendaraanMap = {};
+  ['merk','tipe','model','jenis'].forEach(function(id){
+    document.getElementById(id).value='';
+  });
+
+  document.getElementById('pax-box').innerHTML='';
+  document.getElementById('lainnya-box').style.display='none';
+  document.getElementById('kendala-box').style.display='none';
+  document.getElementById('lokasiLabel').innerHTML='Lokasi Tujuan <span class="req">*</span>';
+  document.getElementById('lokasiTujuan').placeholder='Masukkan lokasi tujuan';
+  document.getElementById('dlP').textContent='';
+  document.getElementById('dlK').textContent='';
+  document.getElementById('tglPinjamDisplay').value='';
+  document.getElementById('tglKembaliDisplay').value='';
+  ['wktPinjamH','wktPinjamM','wktKembaliH','wktKembaliM'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.selectedIndex=0;
+  });
+  setTglPinjamRange();
+  filterJamKeluar();
+
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('p'+START_TAB).classList.add('active');
+
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){
+    b.classList.remove('active','done');
+    if(i===START_TAB) b.classList.add('active');
+  });
+
+  document.querySelectorAll('.dot').forEach(function(d,i){
+    d.classList.remove('active','done');
+    if(i===0) d.classList.add('active');
+  });
+
+  var visibleTotal = TOTAL - START_TAB;
+  document.getElementById('pf').style.width = (1/visibleTotal*100)+'%';
+
+  cur = START_TAB;
+  renderNav();
+
+  // Reload daftar kendaraan tersedia dari GAS (exclude yang sedang dipinjam)
+  google.script.run
+    .withSuccessHandler(function(list){
+      sel.innerHTML = '<option value="">— Pilih Plat Nomor —</option>';
+      buildPlatOptions(list);
+    })
+    .withFailureHandler(function(){
+      sel.innerHTML = '<option value="">— Gagal memuat data —</option>';
+    })
+    .getKendaraan();
+}
+
+// ── Refresh Plat Nomor ────────────────────────────────────────
+function refreshPlatNomor(){
+  var sel = document.getElementById('platNomor');
+  var btn = document.getElementById('btnRefreshPlat');
+  var prev = sel.value; // simpan pilihan sebelumnya
+  sel.innerHTML = '<option value="">— Memuat ulang... —</option>';
+  btn.style.opacity = '0.4';
+  btn.style.pointerEvents = 'none';
+  btn.innerHTML = '&#8635;';
+  // Animasi putar
+  btn.style.transition = 'transform .6s linear';
+  btn.style.transform = 'rotate(360deg)';
+  setTimeout(function(){ btn.style.transition=''; btn.style.transform=''; }, 650);
+
+  kendaraanMap = {};
+  google.script.run
+    .withSuccessHandler(function(list){
+      buildPlatOptions(list);
+      // Kembalikan pilihan sebelumnya jika masih tersedia dan tidak disabled
+      if(prev){
+        var opt = sel.querySelector('option[value="'+prev+'"]');
+        if(opt && !opt.disabled) sel.value = prev;
+      }
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    })
+    .withFailureHandler(function(){
+      sel.innerHTML = '<option value="">— Gagal memuat data —</option>';
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    })
+    .getKendaraan();
+}
+function buildPlatOptions(list){
+  kendaraanMap = {};
+  var sel = document.getElementById('platNomor');
+  sel.innerHTML = '<option value="">— Pilih Plat Nomor —</option>';
+  list.forEach(function(k){
+    kendaraanMap[k.plat] = k;
+    var o = document.createElement('option');
+    o.value = k.plat;
+    if(k.dipinjam){
+      o.textContent = k.plat + (k.merk||k.tipe ? ' - '+(k.merk||'')+' '+(k.tipe||'') : '') + ' sedang dipinjam';
+      o.disabled = true;
+      o.style.color = '#b0bec5';
+    } else {
+      o.textContent = k.plat;
+    }
+    sel.appendChild(o);
+  });
+}
+
+function toast(msg, type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className=type+' show';
+  setTimeout(function(){t.className=type},3500);
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
+}
+
+// ── Easter Egg: Ctrl+Alt+W+R ──────────────────────────────────
+(function(){
+  var keys={};
+  document.addEventListener('keydown',function(e){
+    keys[e.key.toLowerCase()]=true;
+    if(keys['control']&&keys['alt']&&keys['w']&&keys['r']){
+      showWiraboy();
+    }
+  });
+  document.addEventListener('keyup',function(e){ keys[e.key.toLowerCase()]=false; });
+
+  function showWiraboy(){
+    if(document.getElementById('wiraboy-overlay')) return;
+    var ov=document.createElement('div');
+    ov.id='wiraboy-overlay';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(21,101,192,0.3);backdrop-filter:blur(4px);'+
+      'z-index:9999;display:flex;align-items:center;justify-content:center;';
+    ov.innerHTML=
+      '<div style="background:#eef2f7;border-radius:20px;padding:28px 32px;'+
+        'box-shadow:14px 14px 28px rgba(163,177,198,0.6),-8px -8px 20px rgba(255,255,255,0.85);'+
+        'display:flex;align-items:center;gap:20px;animation:popIn .35s cubic-bezier(.34,1.56,.64,1);">'+
+        '<div style="width:90px;height:120px;background:linear-gradient(135deg,#b0bec5,#78909c);'+
+          'border-radius:6px;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.2);'+
+          'display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+
+          '<span style="font-size:36px;">&#128100;</span>'+
+        '</div>'+
+        '<div>'+
+          '<div style="font-family:\'Exo 2\',sans-serif;font-size:10px;font-weight:600;'+
+            'color:#7a90b0;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Prompt by:</div>'+
+          '<div style="font-family:\'Exo 2\',sans-serif;font-size:18px;font-weight:700;'+
+            'color:#2c3e60;line-height:1.3;">R. Wiranto E.</div>'+
+          '<div style="font-family:\'Nunito\',sans-serif;font-size:13px;font-weight:600;'+
+            'color:#1a7fd4;margin-top:2px;">"wiraboy"</div>'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(ov);
+    setTimeout(function(){
+      if(ov.parentNode) ov.parentNode.removeChild(ov);
+    },4000);
+  }
+})();
+</script>
+<!-- Custom Date Picker Popup -->
+<div class="dp-overlay" id="dp-overlay" onclick="closeDatePicker()">
+  <div class="dp-popup" id="dp-popup" onclick="event.stopPropagation()">
+    <div class="dp-header">
+      <button class="dp-nav" id="dp-prev" onclick="dpNav(-1)">&#8249;</button>
+      <span class="dp-month-label" id="dp-month-label"></span>
+      <button class="dp-nav" id="dp-next" onclick="dpNav(1)">&#8250;</button>
+    </div>
+    <div class="dp-grid" id="dp-grid"></div>
+  </div>
+</div>
+</body>
+</html>
